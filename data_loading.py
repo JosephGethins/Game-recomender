@@ -8,6 +8,13 @@ from sklearn.feature_extraction.text import CountVectorizer #this is a tool that
 #Import the cosine_similarity (talked about below) from the sklearn library
 from sklearn.metrics.pairwise import cosine_similarity
 
+
+# lambda and its use
+# so lambda is in the form lambda arguments: expression
+# arguments are the inputs and the expression is the output
+# this is used as a short one time operation instead of having a full blown fucntion for each thing
+# this is super useful so make note of this for future python projects
+
 #Load the steam data from the csv file
 def load_steam_data():
 	
@@ -53,16 +60,12 @@ genres_matrix = vector.fit_transform(data["steamspy_tags"]) #this is the matrix 
 
 
 
-# somemore reccomendation stuff to consider:
+# some more reccomendation like algo's stuff to consider:
 #       Pearson Correlation 
 #		Matrix Factorization
 #	    Neaurl Networks (i dont think I can do this one but research it)
 # 		graph based reccomendation systems (not something that makes sense here but I think this was done in second semester data science lab)
 
-
-
-
-# Back to code
 
 # Compute cosine similarity between all games (so its doing what I worked through above)
 similarity_matrix = cosine_similarity(genres_matrix)
@@ -72,8 +75,28 @@ similarity_matrix = cosine_similarity(genres_matrix)
 #print(similarity_matrix[:5, :5])  # making sure it works (it looks like it works seems but I dont see the unique value each game has so I need to see where/how it compares them``)
 
 
+# creating the actual function that returns games based on how similar they are
 
+# this function will take any game and then return n number of games that are similar from asc to desc
 
+def reccomendation(name, n = 10):
+
+	index = data[data["name"] == name].index[0] #this is the index of the game that is being searched for
+
+	similarity = list(enumerate(similarity_matrix[index])) # gets the similarity scores of this game compared to other scores
+
+	similarity = sorted(similarity, key = lambda x : x[1], reverse = True)  #this sorts the similarity scores in descending order`
+
+	# iloc is pandas dataframe method that lets you reference a row and a column from a matrix to get a specific value
+	# it goes in the form of data.iloc[row, column] an it starts at 0!!! important cause I kept messing it up and going 1 too far ahead and misisng out on an entire row and column
+	games_to_recc = [data.iloc[i[0]]["name"] for i in similarity[1:n+1]] #this variable holds now all of the similar games to the one that will be searched for 
+	
+	return games_to_recc
+
+print( "games similar to Portal would be: ")
+print(reccomendation("Portal")) #so this passes it back up into the method etc
+
+	
 
 
 
